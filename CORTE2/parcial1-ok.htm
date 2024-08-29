@@ -1,0 +1,28 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Polígono Regular</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Polígono Regular</h1>
+  <form>
+    <label for="n">Número de lados (n):</label>
+    <input type="number" id="n" min="3" max="12" value="5"><br><br>
+    <label for="lado">Lado (L):</label>
+    <input type="number" id="lado" value="100"><br><br>
+    <label for="centro">Coordenada del centro (x, y):</label>
+    <input type="text" id="centro" value="400, 400"><br><br>
+    <button type="button" onclick="dibujarPoligono()">Dibujar</button>
+  </form>
+  <canvas id="canvas" width="800" height="800"></canvas>
+  <p id="coordenadas"></p>
+  <p id="apotema-label"></p>
+
+  <script src="parcial1-ok.js"></script>
+</body>
+</html>
