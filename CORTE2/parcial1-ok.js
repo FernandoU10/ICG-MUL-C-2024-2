@@ -1,62 +1,139 @@
-const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const coordenadasElement = document.getElementById('coordenadas');
-    const apotemaLabel = document.getElementById('apotema-label');
-
-    function dibujarPoligono() {
-      const n = parseInt(document.getElementById('n').value);
-      const lado = parseInt(document.getElementById('lado').value);
-      const centro = document.getElementById('centro').value;
-
-       /**
-       * Calcula el apotema del polígono a partir del lado.
-       * El apotema es la distancia desde el centro del polígono hasta uno de sus vértices.
-       * La fórmula es: apotema = lado / (2 * tan(π / n)),donde lado es la longitud del lado del polígono y n es el número de lados.
-       */
-      const apotemaCalculado = lado / (2 * Math.tan(Math.PI / n));
-      apotemaLabel.textContent = `El apotema es: ${apotemaCalculado}`;
-
-      /**
-       * Procesa la coordenada del centro.
-       * Si la coordenada es en formato (x, y), la convierte a coordenadas polares (r, θ), aplicando su formula correspondiente es r = sqrt(x^2 + y^2) y θ = atan2(y, x), 
-       * donde atan2 es la función arctangente de dos argumentos.
-       * Si la coordenada es en formato (r, θ), la convierte a coordenadas cartesianas (x, y). La formula para realizar la convercion es la siguiente: "x = r * cos(θ) y y = r * sin(θ)""
-       */
-      const centroParts = centro.split(',');
-      let centerX, centerY;
-      if (centroParts.length === 2) {
-        centerX = parseFloat(centroParts[0]);
-        centerY = parseFloat(centroParts[1]);
-        coordenadasElement.textContent = `Coordenadas cartesianas: (${centerX}, ${centerY})`;
-      } else {
-        alert('Formato de coordenada del centro inválido');
-        return;
-      }
-
-      // Calcula el ángulo para que uno de los lados sea horizontal
-      const angleOffset = Math.PI / 2 - Math.PI / n;
-
-      // Dibuja el polígono en el canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.moveTo(
-        centerX + lado / 2 * Math.cos(angleOffset),
-        centerY + lado / 2 * Math.sin(angleOffset)
-      );
-
-      for (let i = 1; i < n; i++) {
-        ctx.lineTo(
-          centerX + lado / 2 * Math.cos(angleOffset + 2 * Math.PI * i / n),
-          centerY + lado / 2 * Math.sin(angleOffset + 2 * Math.PI * i / n)
-        );
-      }
-
-      ctx.closePath();
-      ctx.stroke();
-
-      // Dibuja un punto verde en el centro del polígono
-      ctx.fillStyle = 'green';
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
-      ctx.fill();
+class Cartesiana {
+    constructor(x, y) {
+        this._x = x;
+        this._y = y;
     }
+
+    get x() {
+        return this._x;
+    }
+
+    set x(valor) {
+        this._x = valor;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(valor) {
+        this._y = valor;
+    }
+}
+
+class Poligono {
+    constructor(n, lado, apotema, centro) {
+        this._n = n;
+        this._lado = lado;
+        this._apotema = apotema;
+        this._centro = centro;
+    }
+
+    get n() {
+        return this._n;
+    }
+
+    set n(valor) {
+        this._n = valor;
+    }
+
+    get lado() {
+        return this._lado;
+    }
+
+    set lado(valor) {
+        this._lado = valor;
+    }
+
+    get apotema() {
+        return this._apotema;
+    }
+
+    set apotema(valor) {
+        this._apotema = valor;
+    }
+
+    get centro() {
+        return this._centro;
+    }
+
+    set centro(valor) {
+        this._centro = valor;
+    }
+
+    // Método para calcular el lado a partir del apotema
+    calcularLado() {
+        return 2 * this._apotema * Math.tan(Math.PI / this._n);
+    }
+
+    // Método para calcular el apotema a partir del lado
+    calcularApotema() {
+        return this._lado / (2 * Math.tan(Math.PI / this._n));
+    }
+
+    // Método para dibujar el polígono
+    dibujar(canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Calcular el radio del círculo circunscrito
+        const radio = this._lado / (2 * Math.sin(Math.PI / this._n));
+
+        // Dibujar el polígono
+        ctx.beginPath();
+        for (let i = 0; i < this._n; i++) {
+            const angle = (i / this._n) * 2 * Math.PI;
+            const px = this._centro.x + radio * Math.cos(angle);
+            const py = this._centro.y + radio * Math.sin(angle);
+            if (i === 0) {
+                ctx.moveTo(px, py);
+            } else {
+                ctx.lineTo(px, py);
+            }
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+}
+
+function actualizarFormulario() {
+    const tipo = document.getElementById('tipo').value;
+    if (tipo === 'lado') {
+        document.getElementById('medida').style.display = 'block';
+        document.getElementById('apotemaMedida').style.display = 'none';
+    } else {
+        document.getElementById('medida').style.display = 'none';
+        document.getElementById('apotemaMedida').style.display = 'block';
+    }
+}
+
+function dibujarPoligono() {
+    const n = parseInt(document.getElementById('n').value);
+    const tipo = document.getElementById('tipo').value;
+    const x = parseInt(document.getElementById('x').value);
+    const y = parseInt(document.getElementById('y').value);
+    const centro = new Cartesiana(x, y);
+
+    let lado, apotema;
+    if (tipo === 'lado') {
+        lado = parseFloat(document.getElementById('lado').value);
+        apotema = null;
+    } else {
+        apotema = parseFloat(document.getElementById('apotema').value);
+        lado = null;
+    }
+
+    // Calcula el lado si se ingresó el apotema, o el apotema si se ingresó el lado
+    if (lado === null) {
+        lado = 2 * apotema * Math.tan(Math.PI / n);
+    } else {
+        apotema = lado / (2 * Math.tan(Math.PI / n));
+    }
+
+    const poligono = new Poligono(n, lado, apotema, centro);
+    const canvas = document.getElementById('canvas');
+    poligono.dibujar(canvas);
+}
+
+// Inicializar el formulario en la carga de la página
+window.onload = actualizarFormulario;
