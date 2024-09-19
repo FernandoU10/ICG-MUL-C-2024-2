@@ -9,7 +9,7 @@ class Linea {
     }
 
     dibujar() {
-        const linea = document.createElementNS("http://www.w3.org/2000/svg", "line"); 
+        const linea = document.createElementNS("http://www.w3.org/2000/svg", "line"); //Esto es esencial para que el navegador reconozca y renderice correctamente los elementos SVG.
         linea.setAttribute("x1", this.x1);
         linea.setAttribute("y1", this.y1);
         linea.setAttribute("x2", this.x2);
