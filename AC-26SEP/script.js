@@ -79,13 +79,43 @@ class Circunferencia {
     }
 
     dibujar() {
-        const circunferencia = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circunferencia.setAttribute("cx", this.#centro.getX());
-        circunferencia.setAttribute("cy", this.#centro.getY());
-        circunferencia.setAttribute("r", this.#r);
-        circunferencia.setAttribute("fill", "none");
-        circunferencia.setAttribute("stroke", "black");
-        svg.appendChild(circunferencia);
+        const puntos = this.bresenhamCircunferencia();
+        puntos.forEach(punto => {
+            const pixel = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            pixel.setAttribute("cx", punto.x);
+            pixel.setAttribute("cy", punto.y);
+            pixel.setAttribute("r", 1); // Radio del punto
+            pixel.setAttribute("fill", "black");
+            svg.appendChild(pixel);
+        });
+    }
+
+    bresenhamCircunferencia() {
+        const puntos = [];
+        let x0 = this.#centro.getX();
+        let y0 = this.#centro.getY();
+        let x = this.#r;
+        let y = 0;
+        let err = 0;
+
+        while (x >= y) {
+            puntos.push({ x: x0 + x, y: y0 + y });
+            puntos.push({ x: x0 + y, y: y0 + x });
+            puntos.push({ x: x0 - y, y: y0 + x });
+            puntos.push({ x: x0 - x, y: y0 + y });
+            puntos.push({ x: x0 - x, y: y0 - y });
+            puntos.push({ x: x0 - y, y: y0 - x });
+            puntos.push({ x: x0 + y, y: y0 - x });
+            puntos.push({ x: x0 + x, y: y0 - y });
+
+            y++;
+            err += 1 + 2 * y;
+            if (2 * err > 2 * x + 1) {
+                x--;
+                err -= 2 * x + 1;
+            }
+        }
+        return puntos;
     }
 }
 
@@ -101,14 +131,69 @@ class Elipse {
     }
 
     dibujar() {
-        const elipse = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-        elipse.setAttribute("cx", this.#centro.getX());
-        elipse.setAttribute("cy", this.#centro.getY());
-        elipse.setAttribute("rx", this.#a);
-        elipse.setAttribute("ry", this.#b);
-        elipse.setAttribute("fill", "none");
-        elipse.setAttribute("stroke", "black");
-        svg.appendChild(elipse);
+        const puntos = this.bresenhamElipse();
+        puntos.forEach(punto => {
+            const pixel = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            pixel.setAttribute("cx", punto.x);
+            pixel.setAttribute("cy", punto.y);
+            pixel.setAttribute("r", 1); // Radio del punto
+            pixel.setAttribute("fill", "black");
+            svg.appendChild(pixel);
+        });
+    }
+
+    bresenhamElipse() {
+        const puntos = [];
+        const x0 = this.#centro.getX();
+        const y0 = this.#centro.getY();
+        const a = this.#a;
+        const b = this.#b;
+
+        let x = 0;
+        let y = b;
+        let a2 = a * a;
+        let b2 = b * b;
+        let crit1 = b2 - (a2 * b) + (0.25 * a2);
+        let crit2 = 0;
+
+        // Primera mitad de la elipse
+        while (a2 * (y - 0.5) > b2 * (x + 1)) {
+            puntos.push({ x: x0 + x, y: y0 + y });
+            puntos.push({ x: x0 - x, y: y0 + y });
+            puntos.push({ x: x0 + x, y: y0 - y });
+            puntos.push({ x: x0 - x, y: y0 - y });
+
+            if (crit1 < 0) {
+                x++;
+                crit1 += 2 * b2 * x + b2;
+            } else {
+                x++;
+                y--;
+                crit1 += 2 * b2 * x - 2 * a2 * y + b2;
+            }
+        }
+
+        // Segunda mitad de la elipse
+        x = a;
+        y = 0;
+        crit2 = a2 - (b2 * a) + (0.25 * b2);
+        while (b2 * (x - 0.5) > a2 * (y + 1)) {
+            puntos.push({ x: x0 + x, y: y0 + y });
+            puntos.push({ x: x0 - x, y: y0 + y });
+            puntos.push({ x: x0 + x, y: y0 - y });
+            puntos.push({ x: x0 - x, y: y0 - y });
+
+            if (crit2 < 0) {
+                y++;
+                crit2 += 2 * a2 * y + a2;
+            } else {
+                x--;
+                y++;
+                crit2 += 2 * a2 * y - 2 * b2 * x + a2;
+            }
+        }
+
+        return puntos;
     }
 }
 
