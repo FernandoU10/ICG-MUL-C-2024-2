@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polígono Vectorizado y Rasterizado</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        #svgContainer {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dibujo de Polígono</h1>
+    
+    <h2>Formato Vectorizado (SVG)</h2>
+    <div id="svgContainer">
+        <svg id="svgPolygon" width="400" height="400"></svg>
+    </div>
+    
+    <h2>Formato Rasterizado (Canvas)</h2>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    
+    <p id="tipo"></p>
+
+    <script src="script.js"></script>
+</body>
+</html>
