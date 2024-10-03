@@ -19,10 +19,6 @@ class Punto {
     }
 }
 
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
-
-// Función para generar puntos aleatorios
 function generarPuntos(cantidad) {
     const puntos = [];
     for (let i = 0; i < cantidad; i++) {
@@ -33,7 +29,6 @@ function generarPuntos(cantidad) {
     return puntos;
 }
 
-// Función para calcular el centroide
 function calcularCentroid(puntos) {
     const sumX = puntos.reduce((acc, punto) => acc + punto.x, 0);
     const sumY = puntos.reduce((acc, punto) => acc + punto.y, 0);
@@ -42,7 +37,6 @@ function calcularCentroid(puntos) {
     return new Punto(centerX, centerY);
 }
 
-// Función para ordenar los puntos en sentido horario
 function ordenarPuntos(puntos, centroid) {
     return puntos.sort((a, b) => {
         const angleA = Math.atan2(a.y - centroid.y, a.x - centroid.x);
@@ -51,32 +45,27 @@ function ordenarPuntos(puntos, centroid) {
     });
 }
 
-// Función para dibujar los puntos
-function dibujarPuntos(puntos) {
+function dibujarPuntos(puntos, svgCanvas) {
     puntos.forEach(punto => {
-        context.fillStyle = punto.color; // Usar el color del punto
-        context.beginPath();
-        context.arc(punto.x, punto.y, 8, 0, Math.PI * 2); // Dibujar un círculo más grande
-        context.fill();
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", punto.x);
+        circle.setAttribute("cy", punto.y);
+        circle.setAttribute("r", 5); // Tamaño de los puntos
+        circle.setAttribute("fill", punto.color); // Color del punto
+        svgCanvas.appendChild(circle);
     });
 }
 
-// Función para dibujar el polígono
-function dibujarPoligono(puntos) {
-    context.beginPath();
-    context.moveTo(puntos[0].x, puntos[0].y);
-    for (const punto of puntos) {
-        context.lineTo(punto.x, punto.y);
-    }
-    context.closePath();
-    context.strokeStyle = 'red';
-    context.lineWidth = 2;
-    context.stroke();
-    context.fillStyle = 'rgba(255, 0, 0, 0.5)';
-    context.fill();
+function dibujarPoligono(puntos, svgCanvas) {
+    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const pointsAttr = puntos.map(p => `${p.x},${p.y}`).join(" ");
+    polygon.setAttribute("points", pointsAttr);
+    polygon.setAttribute("stroke", "red");
+    polygon.setAttribute("fill", "rgba(255, 0, 0, 0.5)");
+    polygon.setAttribute("stroke-width", "2");
+    svgCanvas.appendChild(polygon);
 }
 
-// Función para verificar si el polígono es convexo
 function esConvexo(puntos) {
     let sign = 0;
     const n = puntos.length;
@@ -100,14 +89,17 @@ function esConvexo(puntos) {
 }
 
 document.getElementById('generar').addEventListener('click', () => {
+    const svgCanvas = document.getElementById('svgCanvas');
+    while (svgCanvas.firstChild) {
+        svgCanvas.removeChild(svgCanvas.firstChild); // Limpiar el SVG
+    }
     const puntos = generarPuntos(10); // Generar 10 puntos
 
     const centroid = calcularCentroid(puntos); // Calcular el centroide
     const puntosOrdenados = ordenarPuntos(puntos, centroid); // Ordenar puntos en sentido horario
 
-    context.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
-    dibujarPuntos(puntosOrdenados); // Dibujar los puntos
-    dibujarPoligono(puntosOrdenados); // Dibujar el polígono
+    dibujarPuntos(puntosOrdenados, svgCanvas); // Dibujar los puntos
+    dibujarPoligono(puntosOrdenados, svgCanvas); // Dibujar el polígono
 
     const tipo = esConvexo(puntosOrdenados) ? "Convexo" : "Cóncavo";
     document.getElementById('tipo').innerText = `El polígono es: ${tipo}`;
