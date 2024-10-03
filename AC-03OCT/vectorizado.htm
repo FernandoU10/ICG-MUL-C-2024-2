@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polígono Aleatorio Rasterizado</title>
+    <title>Polígono Aleatorio Vectorizado</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Generador de Polígonos Aleatorios Rasterizados</h1>
+    <h1>Generador de Polígonos Aleatorios Vectorizados</h1>
     <button id="generar">Generar Polígono</button>
-    <canvas id="canvas" width="500" height="500"></canvas>
+    <svg id="svgCanvas" width="500" height="500">
+        <rect width="100%" height="100%" fill="lightgrey"/>
+    </svg>
     <p id="tipo"></p>
 
-    <script src="rasterizado.js"></script>
+    <script src="vectorizado.js"></script>
 </body>
 </html>

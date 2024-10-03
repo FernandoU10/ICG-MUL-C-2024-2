@@ -1,39 +1,41 @@
 class Punto {
+    #x; // Propiedad privada
+    #y; // Propiedad privada
+
     constructor(x, y) {
-        this._x = x; // Encapsulamiento
-        this._y = y; // Encapsulamiento
-        this.color = this.generarColor(); // Asignar un color aleatorio
+        this.#x = x;
+        this.#y = y;
+        this.color = this.generarColor();
     }
 
     get x() {
-        return this._x;
+        return this.#x; // Getter para x
     }
 
     get y() {
-        return this._y;
+        return this.#y; // Getter para y
     }
 
     generarColor() {
         const randColor = () => Math.floor(Math.random() * 256);
-        return `rgb(${randColor()}, ${randColor()}, ${randColor()})`; // Generar color RGB aleatorio
+        return `rgb(${randColor()}, ${randColor()}, ${randColor()})`;
     }
 }
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-// Función para generar puntos aleatorios
-function generarPuntos(cantidad) {
+function generarPuntos() {
+    const cantidad = Math.floor(Math.random() * 8) + 3; // Entre 3 y 10 puntos
     const puntos = [];
     for (let i = 0; i < cantidad; i++) {
         const x = Math.floor(Math.random() * 400) + 50; // Random x between 50 and 450
         const y = Math.floor(Math.random() * 400) + 50; // Random y between 50 and 450
-        puntos.push(new Punto(x, y)); // Crear objeto Punto
+        puntos.push(new Punto(x, y));
     }
     return puntos;
 }
 
-// Función para calcular el centroide
 function calcularCentroid(puntos) {
     const sumX = puntos.reduce((acc, punto) => acc + punto.x, 0);
     const sumY = puntos.reduce((acc, punto) => acc + punto.y, 0);
@@ -42,7 +44,6 @@ function calcularCentroid(puntos) {
     return new Punto(centerX, centerY);
 }
 
-// Función para ordenar los puntos en sentido horario
 function ordenarPuntos(puntos, centroid) {
     return puntos.sort((a, b) => {
         const angleA = Math.atan2(a.y - centroid.y, a.x - centroid.x);
@@ -51,17 +52,15 @@ function ordenarPuntos(puntos, centroid) {
     });
 }
 
-// Función para dibujar los puntos
 function dibujarPuntos(puntos) {
     puntos.forEach(punto => {
-        context.fillStyle = punto.color; // Usar el color del punto
+        context.fillStyle = punto.color;
         context.beginPath();
-        context.arc(punto.x, punto.y, 8, 0, Math.PI * 2); // Dibujar un círculo más grande
+        context.arc(punto.x, punto.y, 8, 0, Math.PI * 2);
         context.fill();
     });
 }
 
-// Función para dibujar el polígono
 function dibujarPoligono(puntos) {
     context.beginPath();
     context.moveTo(puntos[0].x, puntos[0].y);
@@ -76,7 +75,6 @@ function dibujarPoligono(puntos) {
     context.fill();
 }
 
-// Función para verificar si el polígono es convexo
 function esConvexo(puntos) {
     let sign = 0;
     const n = puntos.length;
@@ -100,14 +98,13 @@ function esConvexo(puntos) {
 }
 
 document.getElementById('generar').addEventListener('click', () => {
-    const puntos = generarPuntos(10); // Generar 10 puntos
+    const puntos = generarPuntos();
+    const centroid = calcularCentroid(puntos);
+    const puntosOrdenados = ordenarPuntos(puntos, centroid);
 
-    const centroid = calcularCentroid(puntos); // Calcular el centroide
-    const puntosOrdenados = ordenarPuntos(puntos, centroid); // Ordenar puntos en sentido horario
-
-    context.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
-    dibujarPuntos(puntosOrdenados); // Dibujar los puntos
-    dibujarPoligono(puntosOrdenados); // Dibujar el polígono
+    context.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas antes de dibujar
+    dibujarPuntos(puntosOrdenados);
+    dibujarPoligono(puntosOrdenados);
 
     const tipo = esConvexo(puntosOrdenados) ? "Convexo" : "Cóncavo";
     document.getElementById('tipo').innerText = `El polígono es: ${tipo}`;

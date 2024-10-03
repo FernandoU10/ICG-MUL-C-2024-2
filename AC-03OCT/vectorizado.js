@@ -1,30 +1,34 @@
 class Punto {
+    #x; // Propiedad privada
+    #y; // Propiedad privada
+
     constructor(x, y) {
-        this._x = x; // Encapsulamiento
-        this._y = y; // Encapsulamiento
-        this.color = this.generarColor(); // Asignar un color aleatorio
+        this.#x = x;
+        this.#y = y;
+        this.color = this.generarColor();
     }
 
     get x() {
-        return this._x;
+        return this.#x; // Getter para x
     }
 
     get y() {
-        return this._y;
+        return this.#y; // Getter para y
     }
 
     generarColor() {
         const randColor = () => Math.floor(Math.random() * 256);
-        return `rgb(${randColor()}, ${randColor()}, ${randColor()})`; // Generar color RGB aleatorio
+        return `rgb(${randColor()}, ${randColor()}, ${randColor()})`;
     }
 }
 
-function generarPuntos(cantidad) {
+function generarPuntos() {
+    const cantidad = Math.floor(Math.random() * 8) + 3; // Entre 3 y 10 puntos
     const puntos = [];
     for (let i = 0; i < cantidad; i++) {
         const x = Math.floor(Math.random() * 400) + 50; // Random x between 50 and 450
         const y = Math.floor(Math.random() * 400) + 50; // Random y between 50 and 450
-        puntos.push(new Punto(x, y)); // Crear objeto Punto
+        puntos.push(new Punto(x, y));
     }
     return puntos;
 }
@@ -50,7 +54,7 @@ function dibujarPuntos(puntos, svgCanvas) {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", punto.x);
         circle.setAttribute("cy", punto.y);
-        circle.setAttribute("r", 5); // Tamaño de los puntos
+        circle.setAttribute("r", 8); // Tamaño de los puntos
         circle.setAttribute("fill", punto.color); // Color del punto
         svgCanvas.appendChild(circle);
     });
@@ -91,15 +95,15 @@ function esConvexo(puntos) {
 document.getElementById('generar').addEventListener('click', () => {
     const svgCanvas = document.getElementById('svgCanvas');
     while (svgCanvas.firstChild) {
-        svgCanvas.removeChild(svgCanvas.firstChild); // Limpiar el SVG
+        svgCanvas.removeChild(svgCanvas.firstChild); // Limpiar el canvas
     }
-    const puntos = generarPuntos(10); // Generar 10 puntos
 
-    const centroid = calcularCentroid(puntos); // Calcular el centroide
-    const puntosOrdenados = ordenarPuntos(puntos, centroid); // Ordenar puntos en sentido horario
+    const puntos = generarPuntos();
+    const centroid = calcularCentroid(puntos);
+    const puntosOrdenados = ordenarPuntos(puntos, centroid);
 
-    dibujarPuntos(puntosOrdenados, svgCanvas); // Dibujar los puntos
-    dibujarPoligono(puntosOrdenados, svgCanvas); // Dibujar el polígono
+    dibujarPuntos(puntosOrdenados, svgCanvas);
+    dibujarPoligono(puntosOrdenados, svgCanvas);
 
     const tipo = esConvexo(puntosOrdenados) ? "Convexo" : "Cóncavo";
     document.getElementById('tipo').innerText = `El polígono es: ${tipo}`;
