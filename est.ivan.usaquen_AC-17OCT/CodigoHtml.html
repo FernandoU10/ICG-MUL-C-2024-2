@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relleno y Recorte</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        #controls {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button onclick="floodFill()">Rellenar</button>
+        <button onclick="clip()">Recortar</button>
+    </div>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
